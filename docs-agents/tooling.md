@@ -1,0 +1,6 @@
+# Rule: Tooling gotchas
+
+- `npm` is canonical. Both `package-lock.json` and `pnpm-lock.yaml` are committed, but `.idx/dev.nix` and `.replit` both invoke `npm`, treat `pnpm-lock.yaml` as incidental, not a signal to switch package managers.
+- **`npm run lint` is currently broken.** `eslint` is not in `devDependencies`, there is no `node_modules/.bin/eslint`, and there is no ESLint config file anywhere in the repo. Running it will stall asking to install ESLint interactively. Do not run it from a hook or a loop, and do not rely on it to catch issues. Use `npx tsc --noEmit` for static checking instead, until ESLint is actually installed and configured. If asked to fix linting, that means adding `eslint` + `eslint-config-next` as devDependencies and adding a config, not just changing code.
+- Dev server runs on port 3000 (`npm run dev`), matching what both `.idx/dev.nix` and `.replit` assume. Don't change the default port without updating both files.
+- `npm run build` produces a static export into `/out` (`next.config.js`, `output: 'export'`). `npm run start` (`next start`) is built for a server build and is not a reliable way to verify a static export, if you need to eyeball the exported output, serve `/out` with a plain static file server instead.
